@@ -96,6 +96,7 @@ export default class ImageTool implements BlockTool {
       field: config.field,
       types: config.types,
       captionPlaceholder: this.api.i18n.t(config.captionPlaceholder ?? 'Caption'),
+      altPlaceholder: this.api.i18n.t(config.captionPlaceholder ?? 'Alt'),
       buttonContent: config.buttonContent,
       uploader: config.uploader,
       actions: config.actions,
@@ -132,6 +133,7 @@ export default class ImageTool implements BlockTool {
      */
     this._data = {
       caption: '',
+      alt: '',
       withBorder: false,
       withBackground: false,
       stretched: false,
@@ -194,6 +196,10 @@ export default class ImageTool implements BlockTool {
     if (this.config.features?.caption === true || this.config.features?.caption === undefined || (this.config.features?.caption === 'optional' && this.data.caption)) {
       this.ui.applyTune('caption', true);
     }
+    
+    if (this.config.features?.alt === true || this.config.features?.alt === undefined || (this.config.features?.alt === 'optional' && this.data.alt)) {
+      this.ui.applyTune('alt', true);
+    }
 
     return this.ui.render(this.data) as HTMLDivElement;
   }
@@ -212,8 +218,10 @@ export default class ImageTool implements BlockTool {
    */
   public save(): ImageToolData {
     const caption = this.ui.nodes.caption;
+    const alt = this.ui.nodes.alt;
 
     this._data.caption = caption.innerHTML;
+    this._data.alt = alt.innerHTML;
 
     return this.data;
   }
@@ -231,15 +239,29 @@ export default class ImageTool implements BlockTool {
       background: 'withBackground',
       stretch: 'stretched',
       caption: 'caption',
+      alt: 'alt',
     };
 
     if (this.config.features?.caption === 'optional') {
-      tunes.push({
-        name: 'caption',
-        icon: IconText,
-        title: 'With caption',
-        toggle: true,
-      });
+      tunes.push(
+        {
+          name: 'caption',
+          icon: IconText,
+          title: 'With caption',
+          toggle: true,
+        },
+      );
+    }
+
+    if (this.config.features?.alt === 'optional') {
+      tunes.push(
+        {
+          name: 'alt',
+          icon: IconText,
+          title: 'With alt',
+          toggle: true,
+        },
+      );
     }
 
     const availableTunes = tunes.filter((tune) => {
@@ -247,6 +269,10 @@ export default class ImageTool implements BlockTool {
 
       if (featureKey === 'caption') {
         return this.config.features?.caption !== false;
+      }
+
+      if (featureKey === 'alt') {
+        return this.config.features?.alt !== false;
       }
 
       return featureKey == null || this.config.features?.[featureKey as keyof FeaturesConfig] !== false;
@@ -360,7 +386,9 @@ export default class ImageTool implements BlockTool {
     this.image = data.file;
 
     this._data.caption = data.caption || '';
+    this._data.alt = data.alt || '';
     this.ui.fillCaption(this._data.caption);
+    this.ui.fillAlt(this._data.alt);
 
     ImageTool.tunes.forEach(({ name: tune }) => {
       const value = typeof data[tune as keyof ImageToolData] !== 'undefined' ? data[tune as keyof ImageToolData] === true || data[tune as keyof ImageToolData] === 'true' : false;
@@ -405,8 +433,6 @@ export default class ImageTool implements BlockTool {
    * @param errorText - uploading error info
    */
   private uploadingFailed(errorText: string): void {
-    console.log('Image Tool: uploading failed because of', errorText);
-
     this.api.notifier.show({
       message: this.api.i18n.t('Couldn’t upload image. Please try another.'),
       style: 'error',
