@@ -9,7 +9,8 @@
   ],
   "description": "Image Tool for Editor.js",
   "license": "MIT",
-  "repository": "https://github.com/editor-js/image",
+  "repository": "https://github.com/hptruong/image",
+  "homepage": "https://github.com/hptruong/image#readme",
   "files": [
     "dist"
   ],
@@ -31,8 +32,7 @@
     "lint:fix": "eslint --fix"
   },
   "author": {
-    "name": "CodeX",
-    "email": "team@ifmo.su"
+    "name": ""
   },
   "devDependencies": {
     "@codexteam/ajax": "^4.2.0",
