@@ -198,10 +198,8 @@ export default class ImageTool implements BlockTool {
     }
     
     if (this.config.features?.alt === true || this.config.features?.alt === undefined || (this.config.features?.alt === 'optional' && this.data.alt)) {
-      console.log('SHOW ALT')
       this.ui.applyTune('alt', true);
     }
-    console.log('render::', this.ui.render(this.data))
 
     return this.ui.render(this.data) as HTMLDivElement;
   }
@@ -279,8 +277,6 @@ export default class ImageTool implements BlockTool {
 
       return featureKey == null || this.config.features?.[featureKey as keyof FeaturesConfig] !== false;
     });
-
-    console.log('AVAILABLE::', availableTunes)
 
     return availableTunes.map(tune => ({
       icon: tune.icon,
@@ -437,8 +433,6 @@ export default class ImageTool implements BlockTool {
    * @param errorText - uploading error info
    */
   private uploadingFailed(errorText: string): void {
-    console.log('Image Tool: uploading failed because of', errorText);
-
     this.api.notifier.show({
       message: this.api.i18n.t('Couldn’t upload image. Please try another.'),
       style: 'error',
